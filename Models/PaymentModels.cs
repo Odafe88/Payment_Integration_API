@@ -38,3 +38,14 @@ public class PaymentVerificationResult
     public string? TransactionId { get; set; }
     public string? RawResponseJson { get; set; }
 }
+
+public class PaymentStatusResult
+{
+    public string Reference { get; set; } = string.Empty;
+    public PaymentProvider Provider { get; set; }
+    public string Status { get; set; } = string.Empty;
+    public bool IsSuccess { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
+    public string? TransactionId { get; set; }
+}

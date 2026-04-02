@@ -32,6 +32,16 @@ public class PaymentsController : ControllerBase
         return Ok(result);
     }
 
+    [HttpGet("status/{reference}")]
+    public async Task<ActionResult<PaymentStatusResult>> GetStatus(string reference, [FromQuery] bool refresh = false)
+    {
+        if (string.IsNullOrWhiteSpace(reference))
+            return BadRequest("Reference is required.");
+
+        var result = await _paymentService.GetStatusAsync(reference, refresh);
+        return Ok(result);
+    }
+
     [HttpPost("verify")]
     public async Task<ActionResult<PaymentVerificationResult>> Verify([FromQuery] PaymentProvider provider, [FromQuery] string reference)
     {
@@ -42,10 +52,32 @@ public class PaymentsController : ControllerBase
         return Ok(result);
     }
 
-    [HttpPost("webhook")]
-    public async Task<IActionResult> Webhook([FromBody] object content)
+    [HttpPost("webhook/paystack")]
+    public async Task<IActionResult> PaystackWebhook()
     {
-        // TODO: implement per-provider webhook verification and event handling
-        return Ok(new { received = true });
+        var result = await _paymentService.ProcessWebhookAsync(PaymentProvider.Paystack, Request);
+        return result ? Ok() : BadRequest();
+    }
+
+    [HttpPost("webhook/flutterwave")]
+    public async Task<IActionResult> FlutterwaveWebhook()
+    {
+        var result = await _paymentService.ProcessWebhookAsync(PaymentProvider.Flutterwave, Request);
+        return result ? Ok() : BadRequest();
+    }
+
+    [HttpPost("webhook/interswitch")]
+    public async Task<IActionResult> InterswitchWebhook()
+    {
+        var result = await _paymentService.ProcessWebhookAsync(PaymentProvider.Interswitch, Request);
+        return result ? Ok() : BadRequest();
+    }
+
+    [HttpPost("webhook")]
+    public async Task<IActionResult> GenericWebhook([FromBody] object content)
+    {
+        // Fallback: try to detect provider from payload or headers
+        // For now, return received
+        return Ok(new { received = true, content });
     }
 }

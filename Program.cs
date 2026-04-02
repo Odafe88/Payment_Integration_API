@@ -8,6 +8,8 @@ using Payment_Integration_API.Services;
 using Payment_Integration_API.Validators;
 using Polly;
 using Polly.Extensions.Http;
+using Flutterwave.Net;
+using PayStack.Net;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,7 +20,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<PaymentDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection") ?? "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=PaymentIntegrationDb;Integrated Security=True;"));
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection") ?? "Data Source=payment.db"));
 
 builder.Services.Configure<FlutterwaveOptions>(builder.Configuration.GetSection("PaymentProviders:Flutterwave"));
 builder.Services.Configure<PaystackOptions>(builder.Configuration.GetSection("PaymentProviders:Paystack"));
@@ -29,7 +31,7 @@ builder.Services.AddScoped<PaymentService>();
 
 builder.Services.AddHttpClient<FlutterwaveProvider>(client =>
 {
-    client.BaseAddress = new Uri(builder.Configuration.GetValue<string>("PaymentProviders:Flutterwave:BaseUrl") ?? "https://api.flutterwave.com/v3");
+    client.BaseAddress = new Uri(builder.Configuration.GetValue<string>("PaymentProviders:Flutterwave:BaseUrl") ?? "https://api.flutterwave.com/v3/payments");
     client.DefaultRequestHeaders.Authorization =
         new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", builder.Configuration.GetValue<string>("PaymentProviders:Flutterwave:SecretKey"));
 }).AddPolicyHandler(HttpPolicyExtensions.HandleTransientHttpError().WaitAndRetryAsync(3, retry => TimeSpan.FromSeconds(Math.Pow(2, retry))));
