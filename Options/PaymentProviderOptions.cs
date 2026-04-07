@@ -4,7 +4,8 @@ public class FlutterwaveOptions
 {
     public string SecretKey { get; set; } = string.Empty;
     public string BaseUrl { get; set; } = "https://api.flutterwave.com/v3/payments";
-    public string EncryptionKey { get; set; } = string.Empty; // verif-hash
+    public string EncryptionKey { get; set; } = string.Empty; // optional Flutterwave encryption key
+    public string WebhookSecret { get; set; } = string.Empty; // verif-hash for webhook verification
 }
 
 public class PaystackOptions
