@@ -7,6 +7,13 @@ public enum PaymentProvider
     Interswitch
 }
 
+public class SchoolPaymentMetadata
+{
+    public string StudentId { get; set; } = string.Empty;
+    public string FeeType { get; set; } = string.Empty;
+    // public string InvoiceId { get; set; } = string.Empty;
+}
+
 public class PaymentRequest
 {
     public PaymentProvider Provider { get; set; }
@@ -17,7 +24,7 @@ public class PaymentRequest
     public string CustomerName { get; set; } = string.Empty;
     public string? CustomerPhone { get; set; }
     public string? RedirectUrl { get; set; }
-    public Dictionary<string, object>? Metadata { get; set; }
+    public SchoolPaymentMetadata? Metadata {get; set;}
 }
 
 public class PaymentResult

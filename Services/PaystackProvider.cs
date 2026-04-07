@@ -23,7 +23,8 @@ public class PaystackProvider : IPaymentProvider
             email = request.CustomerEmail,
             amount = Convert.ToInt32(request.Amount * 100), // kobo
             reference = request.Reference,
-            callback_url = request.RedirectUrl
+            callback_url = request.RedirectUrl,
+            metadata = ConvertMetadataToDictionary(request.Metadata)
         };
 
         var httpResponse = await _httpClient.PostAsJsonAsync("/transaction/initialize", payload);
@@ -66,6 +67,17 @@ public class PaystackProvider : IPaymentProvider
             Status = data.GetProperty("status").GetString() ?? "unknown",
             TransactionId = data.GetProperty("reference").GetString(),
             RawResponseJson = content
+        };
+    }
+
+    private static Dictionary<string, object>? ConvertMetadataToDictionary(SchoolPaymentMetadata? metadata)
+    {
+        if (metadata == null) return null;
+        return new Dictionary<string, object>
+        {
+            ["studentId"] = metadata.StudentId,
+            ["feeType"] = metadata.FeeType,
+            // ["invoiceId"] = metadata.InvoiceId
         };
     }
 }

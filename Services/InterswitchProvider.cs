@@ -174,6 +174,14 @@ public class InterswitchProvider : IPaymentProvider
             ["customerPhone"] = request.CustomerPhone,
             ["hash"] = GenerateHash(request.Reference, amountInKobo, request.RedirectUrl!)
         };
+
+        // Add metadata to query if present
+        if (request.Metadata != null)
+        {
+            query["studentId"] = request.Metadata.StudentId;
+            query["feeType"] = request.Metadata.FeeType;
+            // query["invoiceId"] = request.Metadata.InvoiceId;
+        }
 #pragma warning restore CS8604 // Possible null reference argument.
 
         var queryString = string.Join("&", query

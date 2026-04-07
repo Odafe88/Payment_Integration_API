@@ -28,8 +28,8 @@ public class FlutterwaveProvider : IPaymentProvider
             currency = request.Currency,
             redirect_url = request.RedirectUrl,
             customer = new { email = request.CustomerEmail, phone_number = request.CustomerPhone, name = request.CustomerName },
-            customizations = new { title = "Bill Payment", description = "Customer to company payment" },
-            meta = request.Metadata
+            customizations = new { title = request.Metadata?.FeeType ?? "Bill Payment", description = "Customer to company payment" },
+            meta = ConvertMetadataToDictionary(request.Metadata)
         };
 
         var httpResponse = await _httpClient.PostAsJsonAsync("payments", payload);
@@ -76,6 +76,17 @@ public class FlutterwaveProvider : IPaymentProvider
             Status = status,
             RedirectUrl = link,
             RawResponseJson = content
+        };
+    }
+
+    private static Dictionary<string, object>? ConvertMetadataToDictionary(SchoolPaymentMetadata? metadata)
+    {
+        if (metadata == null) return null;
+        return new Dictionary<string, object>
+        {
+            ["studentId"] = metadata.StudentId,
+            ["feeType"] = metadata.FeeType,
+            // ["invoiceId"] = metadata.InvoiceId
         };
     }
 
